@@ -1,0 +1,6 @@
+@miniDriveBackend_HostAddress = http://localhost:5104
+
+GET {{miniDriveBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
