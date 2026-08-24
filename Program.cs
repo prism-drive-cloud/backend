@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ./Data/;
+using miniDriveBackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
