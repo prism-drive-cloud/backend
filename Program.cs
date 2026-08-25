@@ -5,12 +5,18 @@ using Microsoft.IdentityModel.Tokens;
 using miniDriveBackend.Business;
 using miniDriveBackend.Business.Configuration;
 using miniDriveBackend.Data;
+using miniDriveBackend.Middleware;
+using miniDriveBackend.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeDocumentTransformer>();
+    options.AddOperationTransformer<BearerSecurityRequirementOperationTransformer>();
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -18,6 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 
 builder.Services.AddDataAccess();
 builder.Services.AddBusinessServices(builder.Configuration);
+builder.Services.AddControllers();
 
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
 
@@ -50,6 +57,9 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+// Centralized exception -> HTTP mapping. Registered first so it wraps the whole pipeline.
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -60,6 +70,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 var summaries = new[]
 {

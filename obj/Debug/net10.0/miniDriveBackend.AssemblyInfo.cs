@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("miniDriveBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f34396c1f988ab195a1a570aed692b1cb69c7877")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3d88d2ebe203d33cee93f145f7c5b88f111b6a36")]
 [assembly: System.Reflection.AssemblyProductAttribute("miniDriveBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("miniDriveBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
