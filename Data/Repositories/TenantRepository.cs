@@ -36,6 +36,23 @@ namespace miniDriveBackend.Data.Repositories
                 .SumAsync(f => f.SizeBytes, cancellationToken);
         }
 
+        public async Task<TenantUsageSummary> GetUsageSummaryAsync(Guid tenantId, CancellationToken cancellationToken = default)
+        {
+            var fileStats = await Context.Files
+                .Where(f => f.TenantId == tenantId && !f.IsDeleted)
+                .GroupBy(_ => 1)
+                .Select(g => new { UsedBytes = g.Sum(f => f.SizeBytes), FileCount = g.Count() })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var folderCount = await Context.Folders
+                .CountAsync(f => f.TenantId == tenantId, cancellationToken);
+
+            return new TenantUsageSummary(
+                fileStats?.UsedBytes ?? 0L,
+                fileStats?.FileCount ?? 0,
+                folderCount);
+        }
+
         public async Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken = default)
         {
             return await DbSet.AnyAsync(t => t.Slug == slug, cancellationToken);

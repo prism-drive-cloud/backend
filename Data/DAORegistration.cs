@@ -12,6 +12,7 @@ namespace miniDriveBackend.Data
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IFolderRepository, FolderRepository>();
             services.AddScoped<IFileRepository, FileRepository>();
+            services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             return services;
         }
     }

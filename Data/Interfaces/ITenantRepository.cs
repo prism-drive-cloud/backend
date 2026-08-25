@@ -12,6 +12,9 @@ namespace miniDriveBackend.Data.Interfaces
         Task<Tenant?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
         Task<Tenant> CreateAsync(Tenant tenant, CancellationToken cancellationToken = default);
         Task<long> GetUsageAsync(Guid tenantId, CancellationToken cancellationToken = default);
+        Task<TenantUsageSummary> GetUsageSummaryAsync(Guid tenantId, CancellationToken cancellationToken = default);
         Task<bool> ExistsBySlugAsync(string slug, CancellationToken cancellationToken = default);
     }
+
+    public record TenantUsageSummary(long UsedBytes, int FileCount, int FolderCount);
 }

@@ -28,7 +28,7 @@ namespace miniDriveBackend.Business.DTOs
         string RefreshToken,
         DateTimeOffset ExpiresAt,
         UserProfileResponse User,
-        TenantResponse Tenant
+        TenantResponse? Tenant
     );
 
     public record UserProfileResponse(
