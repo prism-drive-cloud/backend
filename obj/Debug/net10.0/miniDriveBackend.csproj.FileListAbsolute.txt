@@ -36,3 +36,15 @@
 /home/santiago/Projects/C#/miniDriveBackend/obj/Debug/net10.0/miniDriveBackend.pdb
 /home/santiago/Projects/C#/miniDriveBackend/obj/Debug/net10.0/miniDriveBackend.genruntimeconfig.cache
 /home/santiago/Projects/C#/miniDriveBackend/obj/Debug/net10.0/ref/miniDriveBackend.dll
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.csproj.AssemblyReference.cache
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\rpswa.dswa.cache.json
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.AssemblyInfoInputs.cache
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.AssemblyInfo.cs
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.csproj.CoreCompileInputs.cache
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.sourcelink.json
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.dll
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\refint\miniDriveBackend.dll
+C:\Users\brayh\OneDrive\Desktop\backend\obj\Debug\net10.0\miniDriveBackend.pdb
