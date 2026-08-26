@@ -1,24 +1,25 @@
-name: Backend CI
+name: Backend CI/CD
 
 on:
   pull_request:
     branches:
       - master
       - dev
-
   push:
     branches:
-      - master
       - dev
+      - master
 
 permissions:
   contents: read
+  packages: write
+  id-token: write
 
 jobs:
-  build:
-    name: Build Backend
+  build-and-push:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,10 +35,58 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - name: Build Docker image
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: false
+          push: true
           tags: |
-            backend:ci-${{ github.sha }}
+            ghcr.io/${{ github.repository }}:${{ github.ref_name == 'master' && 'latest' || 'dev' }}
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  deploy-qa:
+    name: Deploy to QA
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+    environment:
+      name: qa
+      url: https://qa-api.minidrive.coderhivex.com
+    
+    steps:
+      - name: Deploy to QA via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/apps/backend
+            ./deploy.sh qa
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    environment:
+      name: production
+      url: https://api.minidrive.coderhivex.com
+    
+    steps:
+      - name: Deploy to Production via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/apps/backend
+            ./deploy.sh prod
