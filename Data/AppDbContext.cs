@@ -11,6 +11,7 @@ namespace miniDriveBackend.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<FileEntity> Files { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -21,6 +22,7 @@ namespace miniDriveBackend.Data
             ConfigureUser(modelBuilder);
             ConfigureFolder(modelBuilder);
             ConfigureFile(modelBuilder);
+            ConfigureRefreshToken(modelBuilder);
         }
 
         private static void ConfigureBaseEntity(ModelBuilder modelBuilder)
@@ -77,7 +79,13 @@ namespace miniDriveBackend.Data
                 entity.Property(e => e.Email).HasColumnName("email").IsRequired().HasMaxLength(255);
                 entity.Property(e => e.PasswordHash).HasColumnName("password_hash").IsRequired();
                 entity.Property(e => e.FullName).HasColumnName("full_name").IsRequired().HasMaxLength(255);
-                entity.Property(e => e.Role).HasColumnName("role").IsRequired().HasConversion<string>();
+                entity.Property(e => e.Role).HasColumnName("role").IsRequired().HasConversion(
+                    v => v == UserRole.SuperAdmin ? "super_admin"
+                        : v == UserRole.TenantAdmin ? "tenant_admin"
+                        : "user",
+                    v => v == "super_admin" ? UserRole.SuperAdmin
+                        : v == "tenant_admin" ? UserRole.TenantAdmin
+                        : UserRole.User);
                 entity.Property(e => e.IsActive).HasColumnName("is_active").HasDefaultValue(true);
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
                 entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
@@ -162,6 +170,33 @@ namespace miniDriveBackend.Data
                     .HasForeignKey(e => e.FolderId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("fk_files_folder_id");
+            });
+        }
+
+        private static void ConfigureRefreshToken(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.ToTable("refresh_tokens");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.UserId).HasColumnName("user_id").IsRequired();
+                entity.Property(e => e.TokenHash).HasColumnName("token_hash").IsRequired();
+                entity.Property(e => e.ExpiresAt).HasColumnName("expires_at").IsRequired();
+                entity.Property(e => e.RevokedAt).HasColumnName("revoked_at");
+                entity.Property(e => e.ReplacedByTokenId).HasColumnName("replaced_by_token_id");
+                entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+                entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+                entity.HasIndex(e => e.TokenHash).IsUnique().HasDatabaseName("uq_refresh_tokens_token_hash");
+                entity.HasIndex(e => e.UserId).HasDatabaseName("idx_refresh_tokens_user_id");
+
+                entity.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("fk_refresh_tokens_user_id");
             });
         }
     }

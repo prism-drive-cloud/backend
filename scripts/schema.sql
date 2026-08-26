@@ -214,3 +214,32 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_files_validate_tenant
 BEFORE INSERT OR UPDATE ON files
 FOR EACH ROW EXECUTE FUNCTION fn_validate_file_tenant_consistency();
+
+-- ---------------------------------------------------------
+-- 7. TABLA: refresh_tokens
+--    Sesiones de larga duración. Se guarda SOLO el hash del
+--    token (SHA-256), nunca el valor en claro. Soporta
+--    expiración, revocación y rotación (replaced_by_token_id).
+-- ---------------------------------------------------------
+CREATE TABLE refresh_tokens (
+    id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id              UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash           TEXT NOT NULL,
+    expires_at           TIMESTAMPTZ NOT NULL,
+    revoked_at           TIMESTAMPTZ NULL,
+    replaced_by_token_id UUID NULL REFERENCES refresh_tokens(id) ON DELETE SET NULL,
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    CONSTRAINT uq_refresh_tokens_token_hash UNIQUE (token_hash)
+);
+
+CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+
+CREATE TRIGGER trg_refresh_tokens_updated_at
+BEFORE UPDATE ON refresh_tokens
+FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
+
+COMMENT ON TABLE refresh_tokens IS 'Refresh tokens con rotación. Se persiste solo el hash (SHA-256), nunca el token en claro.';
+COMMENT ON COLUMN refresh_tokens.token_hash IS 'SHA-256 (hex) del refresh token. El valor en claro solo se entrega una vez al cliente.';
+COMMENT ON COLUMN refresh_tokens.replaced_by_token_id IS 'Token que reemplazó a éste durante la rotación. NULL si aún vigente o revocado sin reemplazo.';
