@@ -22,6 +22,8 @@ namespace miniDriveBackend.Business
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITenantService, TenantService>();
 
+            services.AddScoped<IUserService, UserService>();
+
             return services;
         }
     }
